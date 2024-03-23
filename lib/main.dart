@@ -40,8 +40,6 @@ class _MyHomePageState extends State<MyHomePage> {
   List<Widget> _discoveredPrinters() {
     var widget = <Widget>[];
 
-    print("list of d: ${Bambu.discoveredPrinters}");
-
     for (Bambu printer in Bambu.discoveredPrinters) {
       widget.add(
         Card(
@@ -49,7 +47,24 @@ class _MyHomePageState extends State<MyHomePage> {
             leading: FlutterLogo(size: 72.0),
             title: Text(printer.name),
             subtitle: Text('Model: ${printer.model}\nIP: ${printer.ip}'),
-            trailing: Icon(printer.pass == null ? Icons.lock : Icons.send),
+            trailing: IconButton(
+              onPressed: () {
+                print("Settings for $printer");
+              },
+              icon: const Icon(Icons.settings),
+            ),
+          ),
+        ),
+      );
+    }
+
+    if (widget.length == 0) {
+      widget.add(
+        Card(
+          child: ListTile(
+            leading: CircularProgressIndicator(),
+            title: const Text('Discovering printers...'),
+            subtitle: const Text('This should only take a few seconds'),
           ),
         ),
       );

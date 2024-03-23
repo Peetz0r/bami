@@ -18,7 +18,7 @@ class Bambu {
     DeviceDiscoverer discoverer = DeviceDiscoverer();
     discoverer.start(port: 2021);
 
-    Stream<DiscoveredClient> discoverStream = discoverer.quickDiscoverClients(timeout: const Duration(seconds: 15));
+    Stream<DiscoveredClient> discoverStream = discoverer.quickDiscoverClients(timeout: null);
     // I would like to add query: "urn:bambulab-com:device:3dprinter:1"
     // but it sends that over a hardcoded port 1900, while it needs to be 2021
     // because Bambu uses a nonstandard variation of uPnP/SSDP
@@ -34,7 +34,7 @@ class Bambu {
           client.headers!['DEVNAME.BAMBU.COM']!,
           client.headers!['DEVMODEL.BAMBU.COM']!,
         );
-        print("found new $newBambu");
+        print("found $newBambu");
         state.setState(() {
           discoveredPrinters.add(newBambu);
         });
