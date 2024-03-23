@@ -90,12 +90,12 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "nl.peetz0r" "\0"
-            VALUE "FileDescription", "bami" "\0"
+            VALUE "FileDescription", "BAMI: Bambu Advanced Monitoring Interface" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
             VALUE "InternalName", "bami" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2024 nl.peetz0r. All rights reserved." "\0"
             VALUE "OriginalFilename", "bami.exe" "\0"
-            VALUE "ProductName", "bami" "\0"
+            VALUE "ProductName", "BAMI" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END
