@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
+
 import 'bambu.dart';
 
 void main() {
@@ -37,7 +39,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
 
-  List<Widget> _discoveredPrinters() {
+  List<Widget> _discoveredPrinters(BuildContext context) {
     var widget = <Widget>[];
 
     for (Bambu printer in Bambu.discoveredPrinters) {
@@ -49,7 +51,12 @@ class _MyHomePageState extends State<MyHomePage> {
             subtitle: Text('Model: ${printer.model}\nIP: ${printer.ip}'),
             trailing: IconButton(
               onPressed: () {
-                print("Settings for $printer");
+                showDialog(
+                  context: context,
+                  builder: (context) {
+                    return _settingsDialog(printer);
+                  },
+                );
               },
               icon: const Icon(Icons.settings),
             ),
@@ -73,6 +80,60 @@ class _MyHomePageState extends State<MyHomePage> {
     return widget;
   }
 
+  AlertDialog _settingsDialog(Bambu printer) {
+
+    return AlertDialog(
+      // Retrieve the text that the user has entered by using the
+      // TextEditingController.
+      title: const Text('Settings'),
+      content: ConstrainedBox(
+        constraints: const BoxConstraints.tightFor(),
+        //~ maxWidth: 0.5,
+        child: Column(
+          children: <Widget>[
+            Card(
+              child: ListTile(
+                leading: FlutterLogo(size: 72.0),
+                title: Text(printer.name),
+                subtitle: Text('Model: ${printer.model}\nIP: ${printer.ip}'),
+              ),
+            ),
+            Text("You can only connect locally to a Bambu Labs 3D printer in Lan Only mode. To do this you'll need to enable LAN Only mode on the screen on your printer, and use the Access Code from the display in the app."),
+            ElevatedButton(
+              onPressed: () {
+                launchUrl(Uri.parse('https://wiki.bambulab.com/en/knowledge-sharing/enable-lan-mode'));
+              },
+              child: Text("More details om Bambu Lab Wiki"),
+            ),
+            TextFormField(
+              decoration: InputDecoration(
+                border: UnderlineInputBorder(),
+                labelText: 'Access Code',
+                hintText: 'On the printers display',
+              ),
+              enableSuggestions: false,
+              keyboardType: TextInputType.visiblePassword,
+            ),
+          ],
+        ),
+      ),
+      actions: <Widget>[
+        TextButton(
+          child: const Text('Test'),
+          onPressed: () {
+            printer.testConnection("foo");
+          },
+        ),
+        TextButton(
+          child: const Text('Save'),
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -81,7 +142,7 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text(widget.title),
       ),
       body: ListView(
-        children: _discoveredPrinters(),
+        children: _discoveredPrinters(context),
       ),
     );
   }

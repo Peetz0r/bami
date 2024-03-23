@@ -11,6 +11,7 @@ class Bambu {
   String name;
   String model;
   String? pass;
+  bool autoConnect = false;
 
   static Discover(State<MyHomePage> state) {
     print("Bambu discovery starting");
@@ -44,6 +45,10 @@ class Bambu {
 
   Bambu(this.ip, this.usn, this.name, this.model) {
 
+  }
+
+  bool testConnection(String tmpPass) {
+    return true;
   }
 
   String toString() {
