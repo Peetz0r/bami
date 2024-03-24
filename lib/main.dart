@@ -39,26 +39,63 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
 
+  int _testState = 0;
+  bool _tmpAutoConnect = false;
+  String _tmpPass = '';
+
   List<Widget> _discoveredPrinters(BuildContext context) {
     var widget = <Widget>[];
 
     for (Bambu printer in Bambu.discoveredPrinters) {
       widget.add(
         Card(
-          child: ListTile(
-            leading: FlutterLogo(size: 72.0),
-            title: Text(printer.name),
-            subtitle: Text('Model: ${printer.model}\nIP: ${printer.ip}'),
-            trailing: IconButton(
-              onPressed: () {
+          clipBehavior: Clip.hardEdge,
+          child: InkWell(
+            splashColor: Colors.blue.withAlpha(30),
+            onTap: () {
+              if (printer.pass == null) {
                 showDialog(
                   context: context,
                   builder: (context) {
-                    return _settingsDialog(printer);
+
+                    _testState = 0;
+                    _tmpAutoConnect = printer.autoConnect;
+                    _tmpPass = printer.pass is String ? printer.pass! : '';
+                    return StatefulBuilder(
+                      builder: (context, setState) {
+                        return _settingsDialog(printer, setState, true);
+                      },
+                    );
                   },
                 );
-              },
-              icon: const Icon(Icons.settings),
+              } else {
+                printer.connect();
+              }
+
+            },
+            child: ListTile(
+              leading: FlutterLogo(size: 72.0),
+              title: Text(printer.name),
+              subtitle: Text('Model: ${printer.model}\nIP: ${printer.ip}'),
+              trailing: IconButton(
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (context) {
+
+                      _testState = 0;
+                      _tmpAutoConnect = printer.autoConnect;
+                      _tmpPass = printer.pass is String ? printer.pass! : '';
+                      return StatefulBuilder(
+                        builder: (context, setState) {
+                          return _settingsDialog(printer, setState);
+                        },
+                      );
+                    },
+                  );
+                },
+                icon: const Icon(Icons.settings),
+              ),
             ),
           ),
         ),
@@ -80,55 +117,104 @@ class _MyHomePageState extends State<MyHomePage> {
     return widget;
   }
 
-  AlertDialog _settingsDialog(Bambu printer) {
+  Widget? _testDisplay() {
+    if (_testState == 1) return Center(
+      widthFactor: 1.0,
+      child: SizedBox(
+        width: 20,
+        height: 20,
+        child: CircularProgressIndicator()
+      )
+    );
+    if (_testState == 2) return Icon(Icons.check,  size: 20, color: Colors.green);
+    if (_testState == 3) return Icon(Icons.report, size: 20, color: Colors.red);
+  }
+
+  AlertDialog _settingsDialog(Bambu printer, setState, [bool connect = false]) {
 
     return AlertDialog(
-      // Retrieve the text that the user has entered by using the
-      // TextEditingController.
       title: const Text('Settings'),
-      content: ConstrainedBox(
-        constraints: const BoxConstraints.tightFor(),
-        //~ maxWidth: 0.5,
+      content: SingleChildScrollView(
         child: Column(
           children: <Widget>[
-            Card(
-              child: ListTile(
-                leading: FlutterLogo(size: 72.0),
-                title: Text(printer.name),
-                subtitle: Text('Model: ${printer.model}\nIP: ${printer.ip}'),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              child: Card(
+                child: ListTile(
+                  leading: FlutterLogo(size: 72.0),
+                  title: Text(printer.name),
+                  subtitle: Text('Model: ${printer.model}\nIP: ${printer.ip}'),
+                ),
               ),
             ),
-            Text("You can only connect locally to a Bambu Labs 3D printer in Lan Only mode. To do this you'll need to enable LAN Only mode on the screen on your printer, and use the Access Code from the display in the app."),
-            ElevatedButton(
-              onPressed: () {
-                launchUrl(Uri.parse('https://wiki.bambulab.com/en/knowledge-sharing/enable-lan-mode'));
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+              child: TextFormField(
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(),
+                  labelText: 'Access Code',
+                  suffix: _testDisplay(),
+                ),
+                initialValue: _tmpPass,
+                enableSuggestions: false,
+                keyboardType: TextInputType.visiblePassword,
+                onChanged: (String text) {
+                  _tmpPass = text;
+                  if (_tmpPass.length == 8) {
+                    setState(() { _testState = 1; });
+                    printer.testConnection(_tmpPass).then((e) {
+                      setState(() { _testState = e ? 2 : 3; });
+                    });
+                  } else {
+                    setState(() { _testState = 0; });
+                  }
+                },
+              ),
+            ),
+            SwitchListTile(
+              title: const Text("Auto-connect"),
+              subtitle: const Text("Automatically connect to this printer once detected, skipping the device list"),
+              value: _tmpAutoConnect,
+              onChanged: (bool value) {
+                print("autoConnect: $value");
+                setState(() { _tmpAutoConnect = value; });
               },
-              child: Text("More details om Bambu Lab Wiki"),
             ),
-            TextFormField(
-              decoration: InputDecoration(
-                border: UnderlineInputBorder(),
-                labelText: 'Access Code',
-                hintText: 'On the printers display',
+            Card(
+              child: Padding(
+                padding: EdgeInsets.all(12.0),
+                child: Column(
+                  children: [
+                    Text("You can only connect locally to a Bambu Labs 3D printer in LAN Only mode. To do this you'll need to enable LAN Only mode on the screen on your printer, and enter the Access Code from the printers display here."),
+                    Padding(
+                      padding: EdgeInsets.all(4.0),
+                      child: ElevatedButton(
+                        onPressed: () {
+                          launchUrl(Uri.parse('https://wiki.bambulab.com/en/knowledge-sharing/enable-lan-mode'));
+                        },
+                        child: Text("More details on Bambu Lab Wiki"),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-              enableSuggestions: false,
-              keyboardType: TextInputType.visiblePassword,
             ),
           ],
         ),
       ),
       actions: <Widget>[
         TextButton(
-          child: const Text('Test'),
-          onPressed: () {
-            printer.testConnection("foo");
-          },
+          child: const Text('Cancel'),
+          onPressed: Navigator.of(context).pop,
+
         ),
-        TextButton(
-          child: const Text('Save'),
-          onPressed: () {
+        ElevatedButton(
+          child: Text(connect ? 'Connect' : 'Save'),
+          onPressed: ((_testState == 0 && _tmpPass.length == 8) || _testState == 2) ? () {
+            printer.save(_tmpPass, _tmpAutoConnect);
             Navigator.of(context).pop();
-          },
+            if (connect) printer.connect();
+          } : null,
         ),
       ],
     );
