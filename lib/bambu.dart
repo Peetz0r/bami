@@ -5,6 +5,7 @@ import 'package:mqtt_client/mqtt_client.dart';
 import 'package:mqtt_client/mqtt_server_client.dart';
 
 import 'main.dart';
+import 'printer.dart';
 
 class Bambu {
 
@@ -52,8 +53,14 @@ class Bambu {
     BAMI.prefs!.setString(usn, jsonEncode(this));
   }
 
-  void connect() {
+  void connect(BuildContext context) {
+    print("CTX: $context ?? 'N/A'");
     print("Pretending to connect to $this");
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => PrinterPage(printer: this)),
+    );
   }
 
   String toString() {

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'discovery.dart';
+import 'printer.dart';
 
 void main() async {
   runApp(const BAMI());

@@ -52,7 +52,7 @@ class DiscoveryPage extends StatefulWidget {
           discoveredPrinters.add(printer);
         });
 
-        if (printer.autoConnect) printer.connect();
+        if (printer.autoConnect) printer.connect(state.context);
 
       }
     });
@@ -91,7 +91,7 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
                   },
                 );
               } else {
-                printer.connect();
+                printer.connect(context);
               }
 
             },
@@ -235,7 +235,7 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
           onPressed: ((_testState == 0 && _tmpPass.length == 8) || _testState == 2) ? () {
             printer.save(_tmpPass, _tmpAutoConnect);
             Navigator.of(context).pop();
-            if (connect) printer.connect();
+            if (connect) printer.connect(context);
           } : null,
         ),
       ],
