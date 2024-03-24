@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:upnp2/upnp.dart' hide Icon;
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter/foundation.dart' as Foundation;
 
 import 'main.dart';
 import 'bambu.dart';
@@ -56,6 +57,15 @@ class DiscoveryPage extends StatefulWidget {
 
       }
     });
+
+    if (Foundation.kDebugMode) {
+      await Future.delayed(const Duration(seconds: 3));
+      state.setState(() {
+          discoveredPrinters.add(new Bambu('192.168.126.40', 'DUMMYDUMMYDUMMY' ,'Dummy printer', 'BL-DUMMY'));
+        });
+    }
+
+
   }
 }
 
