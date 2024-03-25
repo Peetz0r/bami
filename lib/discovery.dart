@@ -31,8 +31,8 @@ class DiscoveryPage extends StatefulWidget {
     // so we'll just wait until the printer sends it's own broadcast packet
     // it's once every 5 seconds, not too bad
 
-    discoverStream.listen((DiscoveredClient client) {
-      if(client.headers?['USN'] == null) return;
+    discoverStream.listen((DiscoveredClient client) async {
+      if (client.headers?['USN'] == null) return;
       if (client.headers?['NT'] == "urn:bambulab-com:device:3dprinter:1") {
 
         Bambu printer = new Bambu(
@@ -42,8 +42,8 @@ class DiscoveryPage extends StatefulWidget {
           client.headers?['DEVMODEL.BAMBU.COM'] ?? "",
         );
 
-        if (BAMI.prefs!.containsKey(printer.usn)) {
-          Map<String, Object?> json = jsonDecode(BAMI.prefs!.getString(printer.usn)!);
+        if (await BAMI.prefs.containsKey(key: printer.usn)) {
+          Map<String, Object?> json = jsonDecode((await BAMI.prefs.read(key: printer.usn))!);
           printer.pass = json['pass'] as String?;
           printer.autoConnect = json['autoConnect'] as bool;
         }
@@ -61,8 +61,8 @@ class DiscoveryPage extends StatefulWidget {
     if (Foundation.kDebugMode) {
       await Future.delayed(const Duration(seconds: 3));
       Bambu printer = new Bambu('192.168.126.40', 'DUMMYDUMMYDUMMY' ,'Dummy printer', 'BL-DUMMY');
-      if (BAMI.prefs!.containsKey(printer.usn)) {
-        Map<String, Object?> json = jsonDecode(BAMI.prefs!.getString(printer.usn)!);
+      if (await BAMI.prefs.containsKey(key: printer.usn)) {
+        Map<String, Object?> json = jsonDecode((await BAMI.prefs.read(key: printer.usn))!);
         printer.pass = json['pass'] as String?;
         printer.autoConnect = json['autoConnect'] as bool;
       }

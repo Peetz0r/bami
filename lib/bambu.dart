@@ -50,7 +50,7 @@ class Bambu {
     autoConnect = newAutoConnect;
 
     print("Save printer [$usn]: ${jsonEncode(this)}");
-    BAMI.prefs!.setString(usn, jsonEncode(this));
+    BAMI.prefs.write(key: usn, value: jsonEncode(this));
   }
 
   void connect(BuildContext context) {

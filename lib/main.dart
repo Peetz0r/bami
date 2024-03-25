@@ -1,19 +1,22 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import 'discovery.dart';
 import 'printer.dart';
 
 void main() async {
   runApp(const BAMI());
-
-  BAMI.prefs = await SharedPreferences.getInstance();
 }
 
 class BAMI extends StatelessWidget {
   const BAMI({super.key});
 
-  static SharedPreferences? prefs;
+  static FlutterSecureStorage prefs= FlutterSecureStorage(
+    aOptions: const AndroidOptions(
+      encryptedSharedPreferences: true,
+    ),
+  );
+
   static String title = 'Bambu Advanced Monitoring Interface';
 
 
