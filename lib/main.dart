@@ -1,10 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:video_player/video_player.dart';
+import 'package:video_player_media_kit/video_player_media_kit.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'discovery.dart';
 import 'printer.dart';
 
 void main() async {
+  VideoPlayerMediaKit.ensureInitialized(
+    linux: true,
+    android: true,
+    windows: true,
+    iOS: true,
+    macOS: true,
+  );
+
   runApp(const BAMI());
 
   BAMI.prefs = await SharedPreferences.getInstance();
