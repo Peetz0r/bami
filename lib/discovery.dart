@@ -60,9 +60,17 @@ class DiscoveryPage extends StatefulWidget {
 
     if (Foundation.kDebugMode) {
       await Future.delayed(const Duration(seconds: 3));
+      Bambu printer = new Bambu('192.168.126.40', 'DUMMYDUMMYDUMMY' ,'Dummy printer', 'BL-DUMMY');
+      if (BAMI.prefs!.containsKey(printer.usn)) {
+        Map<String, Object?> json = jsonDecode(BAMI.prefs!.getString(printer.usn)!);
+        printer.pass = json['pass'] as String?;
+        printer.autoConnect = json['autoConnect'] as bool;
+      }
       state.setState(() {
-          discoveredPrinters.add(new Bambu('192.168.126.40', 'DUMMYDUMMYDUMMY' ,'Dummy printer', 'BL-DUMMY'));
-        });
+        discoveredPrinters.add(printer);
+      });
+
+      if (printer.autoConnect) printer.connect(state.context);
     }
 
 
@@ -242,19 +250,6 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
                             padding: EdgeInsets.all(12.0),
                             child: Column(
                               children: [
-                                Text("You can only connect locally to a Bambu Labs 3D printer in LAN Only mode. To do this you'll need to enable LAN Only mode on the screen on your printer, and enter the Access Code from the printers display here."),
-                                Text("You can only connect locally to a Bambu Labs 3D printer in LAN Only mode. To do this you'll need to enable LAN Only mode on the screen on your printer, and enter the Access Code from the printers display here."),
-                                Text("You can only connect locally to a Bambu Labs 3D printer in LAN Only mode. To do this you'll need to enable LAN Only mode on the screen on your printer, and enter the Access Code from the printers display here."),
-                                Text("You can only connect locally to a Bambu Labs 3D printer in LAN Only mode. To do this you'll need to enable LAN Only mode on the screen on your printer, and enter the Access Code from the printers display here."),
-                                Text("You can only connect locally to a Bambu Labs 3D printer in LAN Only mode. To do this you'll need to enable LAN Only mode on the screen on your printer, and enter the Access Code from the printers display here."),
-                                Text("You can only connect locally to a Bambu Labs 3D printer in LAN Only mode. To do this you'll need to enable LAN Only mode on the screen on your printer, and enter the Access Code from the printers display here."),
-                                Text("You can only connect locally to a Bambu Labs 3D printer in LAN Only mode. To do this you'll need to enable LAN Only mode on the screen on your printer, and enter the Access Code from the printers display here."),
-                                Text("You can only connect locally to a Bambu Labs 3D printer in LAN Only mode. To do this you'll need to enable LAN Only mode on the screen on your printer, and enter the Access Code from the printers display here."),
-                                Text("You can only connect locally to a Bambu Labs 3D printer in LAN Only mode. To do this you'll need to enable LAN Only mode on the screen on your printer, and enter the Access Code from the printers display here."),
-                                Text("You can only connect locally to a Bambu Labs 3D printer in LAN Only mode. To do this you'll need to enable LAN Only mode on the screen on your printer, and enter the Access Code from the printers display here."),
-                                Text("You can only connect locally to a Bambu Labs 3D printer in LAN Only mode. To do this you'll need to enable LAN Only mode on the screen on your printer, and enter the Access Code from the printers display here."),
-                                Text("You can only connect locally to a Bambu Labs 3D printer in LAN Only mode. To do this you'll need to enable LAN Only mode on the screen on your printer, and enter the Access Code from the printers display here."),
-                                Text("You can only connect locally to a Bambu Labs 3D printer in LAN Only mode. To do this you'll need to enable LAN Only mode on the screen on your printer, and enter the Access Code from the printers display here."),
                                 Text("You can only connect locally to a Bambu Labs 3D printer in LAN Only mode. To do this you'll need to enable LAN Only mode on the screen on your printer, and enter the Access Code from the printers display here."),
                                 Padding(
                                   padding: EdgeInsets.all(4.0),
