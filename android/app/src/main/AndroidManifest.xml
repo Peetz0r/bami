@@ -1,5 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- mqtt_client requires internet and network_state, see also:
+         https://pub.dev/packages/mqtt_client#android -->
     <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <application
         android:label="BAMI"
         android:name="${applicationName}"

@@ -18,44 +18,40 @@ class Bambu {
   String? pass;
   bool autoConnect = false;
 
-
+  late final MqttServerClient _client;
 
   Bambu(this.ip, this.usn, this.name, this.model) {
+    _client = MqttServerClient(ip, clientId);
+    _client.port = 8883;
+    _client.secure = true;
+    _client.onBadCertificate = (Object a) => true;
 
   }
 
   Future<bool> testConnection(String tmpPass) async {
-    final MqttServerClient client = MqttServerClient(ip, clientId);
-    client.port = 8883;
-    client.secure = true;
-    client.onBadCertificate = (Object a) => true;
-
-    print("Testing: $ip - $clientId - bblp - $tmpPass");
-    print("Testing: $this");
+    print("Testing connection to $this");
 
     try {
-      await client.connect('bblp', tmpPass);
+      await _client.connect('bblp', tmpPass);
     } on Exception catch (e) {
-      client.disconnect();
-      print("Failed! $e");
+      _client.disconnect();
+      print("Failed! ${_client.connectionStatus?.returnCode}"); // "null", not a MqttClientConnectionStatus
       return false;
     }
+
+    _client.disconnect();
     print("Success!");
     return true;
-    client.disconnect();
   }
 
   void save(String newPass, bool newAutoConnect) {
     pass = newPass;
     autoConnect = newAutoConnect;
 
-    print("Save printer [$usn]: ${jsonEncode(this)}");
     BAMI.prefs.write(key: usn, value: jsonEncode(this));
   }
 
   void connect(BuildContext context) {
-    print("CTX: $context ?? 'N/A'");
-    print("Pretending to connect to $this");
 
     Navigator.push(
       context,

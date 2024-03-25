@@ -2,6 +2,17 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<!-- Required for local network access -->
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>Connect to local Bambu printers in LAN Only mode</string>
+	<key>NSBonjourServices</key>
+	<array>
+		<!-- I have no clue what mqtt means. Does it cover only port 1883 or also 8883?
+		     I could not find any documentation explaining this. Only the snippet from:
+		     https://pub.dev/packages/mqtt_client#ios -->
+		<string>mqtt.tcp</string>
+	</array>
+
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
