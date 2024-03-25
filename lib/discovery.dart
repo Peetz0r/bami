@@ -219,7 +219,9 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
                             suffix: _testDisplay(),
                           ),
                           initialValue: _tmpPass,
+                          obscureText: true,
                           enableSuggestions: false,
+                          autocorrect: false,
                           keyboardType: TextInputType.visiblePassword,
                           onChanged: (String text) {
                             _tmpPass = text;
