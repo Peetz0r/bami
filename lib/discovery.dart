@@ -35,7 +35,7 @@ class DiscoveryPage extends StatefulWidget {
       if (client.headers?['USN'] == null) return;
       if (client.headers?['NT'] == "urn:bambulab-com:device:3dprinter:1") {
 
-        Bambu printer = new Bambu(
+        Bambu printer = Bambu(
           client.headers?['LOCATION'] ?? "",
           client.headers!['USN']!,
           client.headers?['DEVNAME.BAMBU.COM'] ?? "",
@@ -60,7 +60,7 @@ class DiscoveryPage extends StatefulWidget {
 
     if (Foundation.kDebugMode) {
       await Future.delayed(const Duration(seconds: 3));
-      Bambu printer = new Bambu('192.168.126.40', 'DUMMYDUMMYDUMMY' ,'Dummy printer', 'BL-DUMMY');
+      Bambu printer = Bambu('192.168.126.40', 'DUMMYDUMMYDUMMY' ,'Dummy printer', 'BL-DUMMY');
       if (await BAMI.prefs.containsKey(key: printer.usn)) {
         Map<String, Object?> json = jsonDecode((await BAMI.prefs.read(key: printer.usn))!);
         printer.pass = json['pass'] as String?;
