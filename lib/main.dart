@@ -25,9 +25,20 @@ class BAMI extends StatelessWidget {
     return MaterialApp(
       title: 'BAMI',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF003e00)),
-        useMaterial3: true,
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color(0xFF003e00),
+          brightness: Brightness.light,
+        ),
+        brightness: Brightness.light,
       ),
+      darkTheme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color(0xFF003e00),
+          brightness: Brightness.dark,
+        ),
+        brightness: Brightness.dark,
+      ),
+      themeMode: ThemeMode.system,
       home: const DiscoveryPage(),
     );
   }
