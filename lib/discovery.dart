@@ -57,23 +57,6 @@ class DiscoveryPage extends StatefulWidget {
 
       }
     });
-
-    if (Foundation.kDebugMode) {
-      await Future.delayed(const Duration(seconds: 3));
-      Bambu printer = Bambu('192.168.126.40', 'DUMMYDUMMYDUMMY' ,'Dummy printer', 'BL-DUMMY');
-      if (await BAMI.prefs.containsKey(key: printer.usn)) {
-        Map<String, Object?> json = jsonDecode((await BAMI.prefs.read(key: printer.usn))!);
-        printer.pass = json['pass'] as String?;
-        printer.autoConnect = json['autoConnect'] as bool;
-      }
-      state.setState(() {
-        discoveredPrinters.add(printer);
-      });
-
-      if (printer.autoConnect) printer.connect(state.context);
-    }
-
-
   }
 }
 
