@@ -290,6 +290,7 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
         title: Text(BAMI.title),
       ),
       body: ListView(
+        padding: const EdgeInsets.all(4),
         children: _discoveredPrinters(context),
       ),
     );

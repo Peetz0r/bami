@@ -104,6 +104,8 @@ class Bambu {
       }
     );
 
+    await _client.updates?.first;
+
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => printerPage),
@@ -116,8 +118,21 @@ class Bambu {
     }
   }
 
-  double? get layer => report?['layer_num'] ?? 0;
-  double? get layers => report?['total_layer_num'] ?? 0;
+  double get layer => report?['layer_num'] ?? 0;
+  double get layers => report?['total_layer_num'] ?? 0;
+
+  String get videoStreamUri {
+    if (report?['ipcam']['rtsp_url'] == null) return '';
+
+    Uri uri = Uri.parse(report?['ipcam']['rtsp_url']);
+    return Uri.new(
+      scheme: uri.scheme,
+      userInfo: 'bblp:$pass',
+      host: uri.host,
+      port: uri.port,
+      path: uri.path,
+    ).toString();
+  }
 
   String toString() {
     return "Bambu([$usn] | $model | $ip | $name | Pass: ${pass == null ? 'N/A' : '*'*pass!.length})";
