@@ -37,6 +37,9 @@ dependencies:
   flutter_secure_storage: ^9.0.0
   dart_casing: ^3.0.1
 
+  video_player: ^2.8.3
+  fvp: ^0.16.1
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
