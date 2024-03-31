@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 while true; do
 
@@ -18,7 +18,7 @@ DevBind.bambu.com: free\r
 Devseclink.bambu.com: secure\r
 DevInf.bambu.com: wlan0\r\n\r\n' | nc -u 255.255.255.255 2021
 
-echo -n 'Sent discovery packet at '; date -Is;
+echo -n 'Sent discovery packet at '; date +%X;
 
 sleep 5;
 
