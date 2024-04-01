@@ -2,10 +2,10 @@
 
 while true; do
 
-echo -ne 'NOTIFY * HTTP/1.1\r
+echo -ne "NOTIFY * HTTP/1.1\r
 Host: 239.255.255.250:1990\r
 Server: Buildroot/2018.02-rc3 UPnP/1.0 ssdpd/1.8\r
-Location: 127.0.0.1\r
+Location: $1\r
 NT: urn:bambulab-com:device:3dprinter:1\r
 NTS: ssdp:alive\r
 USN: 000000000000123\r
@@ -16,7 +16,7 @@ DevSignal.bambu.com: -42\r
 DevConnect.bambu.com: lan\r
 DevBind.bambu.com: free\r
 Devseclink.bambu.com: secure\r
-DevInf.bambu.com: wlan0\r\n\r\n' | nc -u 255.255.255.255 2021
+DevInf.bambu.com: wlan0\r\n\r\n" | nc -u 255.255.255.255 2021
 
 echo -n 'Sent discovery packet at '; date +%X;
 
