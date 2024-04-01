@@ -104,12 +104,34 @@ class Bambu {
       }
     );
 
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          content: Container(
+            margin: const EdgeInsets.all(60),
+            width:  120,
+            height: 120,
+            child: CircularProgressIndicator(),
+          ),
+        );
+      },
+      barrierDismissible: false,
+    );
+
     await _client.updates?.first;
+
+    Navigator.pop(context);
 
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => printerPage),
     );
+  }
+
+  void disconnect() {
+    onReport = null;
+    _client.disconnect();
   }
 
   double? get progress {

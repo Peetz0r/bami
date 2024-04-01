@@ -23,7 +23,6 @@ void main() async {
     doWhenWindowReady(() {
       appWindow.size = const Size(1280, 720);
       appWindow.minSize = const Size(320, 320);
-      appWindow.alignment = Alignment.center;
       appWindow.show();
     });
   }
@@ -38,7 +37,6 @@ class BAMI extends StatelessWidget {
     ),
   );
 
-  static String title = 'Bambu Advanced Monitoring Interface';
   static bool isTV = false;
   static bool isMobile = !isTV && ['ios', 'android'].contains(Platform.operatingSystem);
   static bool isDesktop = !isTV && !isMobile;
@@ -69,10 +67,17 @@ class BAMI extends StatelessWidget {
   static AppBar bar(BuildContext context, [Widget? titleWidget, PreferredSizeWidget? bottomWidget]) {
     ColorScheme cs = Theme.of(context).colorScheme;
 
+    if (titleWidget == null) {
+      titleWidget = ListTile(
+        title: Text('BAMI', style: TextStyle(fontWeight: FontWeight.bold)),
+        subtitle: Text('Bambu Advanced Monitoring Interface'),
+      );
+    }
+
     if (!isDesktop) {
       return AppBar(
         backgroundColor: cs.inversePrimary,
-        title: titleWidget ?? Text(title),
+        title: titleWidget,
         bottom: bottomWidget,
       );
     }
@@ -93,7 +98,7 @@ class BAMI extends StatelessWidget {
           appWindow.startDragging();
         },
         onDoubleTap: () => appWindow.maximizeOrRestore(),
-        child: titleWidget ?? Text(title),
+        child: titleWidget,
       ),
       bottom: bottomWidget,
       actions: <Widget>[

@@ -74,13 +74,12 @@ class _PrinterPageState extends State<PrinterPage> {
   }
 
   @override
-  void dispose() {
-    print("Dispose videoController");
+  void deactivate() {
+    _videoWatchdogTimer.cancel();
     _videoController.dispose();
-    super.dispose();
+    widget.printer.disconnect();
+    super.deactivate();
   }
-
-
 
   @override
   Widget build(BuildContext context) {
