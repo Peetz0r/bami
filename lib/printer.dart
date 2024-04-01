@@ -4,6 +4,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 import 'package:fvp/fvp.dart' as fvp;
+import 'package:bitsdojo_window/bitsdojo_window.dart';
 
 import 'main.dart';
 import 'bambu.dart';
@@ -84,27 +85,30 @@ class _PrinterPageState extends State<PrinterPage> {
   @override
   Widget build(BuildContext context) {
 
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: ListTile(
-          title: Text(widget.printer.name),
-          subtitle: Text(widget.printer.model),
-        ),
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(4.0),
-          child: LinearProgressIndicator(
-            value: widget.printer.progress,
+    return BAMI.border(
+      context,
+      Scaffold(
+        appBar: BAMI.bar(
+          context,
+          ListTile(
+            title: Text(widget.printer.name),
+            subtitle: Text(widget.printer.model),
+          ),
+          PreferredSize(
+            preferredSize: const Size.fromHeight(4.0),
+            child: LinearProgressIndicator(
+              value: widget.printer.progress,
+            ),
           ),
         ),
-      ),
-      body: LayoutBuilder(
-        builder: (BuildContext context, BoxConstraints constraints) {
-          print("constraints.maxWidth = ${constraints.maxWidth}");
-          if (BAMI.isTV) return _buildTV();
-          if (constraints.maxWidth > 640) return _buildDesktop();
-          return _buildMobile();
-        },
+        body: LayoutBuilder(
+          builder: (BuildContext context, BoxConstraints constraints) {
+            print("constraints.maxWidth = ${constraints.maxWidth}");
+            if (BAMI.isTV) return _buildTV();
+            if (constraints.maxWidth > 768) return _buildDesktop();
+            return _buildMobile();
+          },
+        ),
       ),
     );
   }

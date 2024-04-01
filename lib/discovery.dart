@@ -284,14 +284,14 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(BAMI.title),
-      ),
-      body: ListView(
-        padding: const EdgeInsets.all(4),
-        children: _discoveredPrinters(context),
+    return BAMI.border(
+      context,
+      Scaffold(
+        appBar: BAMI.bar(context),
+        body: ListView(
+          padding: const EdgeInsets.all(4),
+          children: _discoveredPrinters(context),
+        ),
       ),
     );
   }
