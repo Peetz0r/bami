@@ -41,6 +41,7 @@ class _PrinterPageState extends State<PrinterPage> {
   @override
   void initState() {
     super.initState();
+
     print("Starting video player with URL ${widget.printer.videoStreamUri}");
     _videoController = VideoPlayerController.network(widget.printer.videoStreamUri);
 
@@ -97,26 +98,79 @@ class _PrinterPageState extends State<PrinterPage> {
           ),
         ),
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(4),
-        children: <Widget> [
-          Text("Printer: ${widget.printer.toString()}\n\nPlatform: ${Platform.operatingSystem} ${Platform.operatingSystemVersion}"),
-
-          Card(
-            clipBehavior: Clip.hardEdge,
-            child: AspectRatio(
-              aspectRatio: 1760/1080, // _videoController.value.aspectRatio is not fast enough
-              child: VideoPlayer(_videoController),
-            ),
-          ),
-
-          Text("playbackSpeed: ${_videoController.value.position}"),
-          Text("Video restarts: ${_videoRestartCounter}"),
-        ],
+      body: LayoutBuilder(
+        builder: (BuildContext context, BoxConstraints constraints) {
+          print("constraints.maxWidth = ${constraints.maxWidth}");
+          if (BAMI.isTV) return _buildTV();
+          if (constraints.maxWidth > 640) return _buildDesktop();
+          return _buildMobile();
+        },
       ),
-
-
-
     );
   }
+
+  Widget _buildTV() {
+    return Row(
+      children: <Widget> [
+        Card(
+          clipBehavior: Clip.hardEdge,
+          child: AspectRatio(
+            aspectRatio: 1760/1080, // _videoController.value.aspectRatio is not fast enough
+            child: VideoPlayer(_videoController),
+          ),
+        ),
+
+        ListView(
+          padding: const EdgeInsets.all(4),
+          children: <Widget> [
+            Text("Printer: ${widget.printer.toString()}"),
+            Text("Platform: ${Platform.operatingSystem} ${Platform.operatingSystemVersion}"),
+            Text("Video position: ${_videoController.value.position}"),
+            Text("Video restarts: ${_videoRestartCounter}"),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDesktop() {
+    return ListView(
+      padding: const EdgeInsets.all(4),
+      children: <Widget> [
+        Text("Printer: ${widget.printer.toString()}\n\nPlatform: ${Platform.operatingSystem} ${Platform.operatingSystemVersion}"),
+
+        Card(
+          clipBehavior: Clip.hardEdge,
+          child: AspectRatio(
+            aspectRatio: 1760/1080, // _videoController.value.aspectRatio is not fast enough
+            child: VideoPlayer(_videoController),
+          ),
+        ),
+
+        Text("playbackSpeed: ${_videoController.value.position}"),
+        Text("Video restarts: ${_videoRestartCounter}"),
+      ],
+    );
+  }
+
+  Widget _buildMobile() {
+    return ListView(
+      padding: const EdgeInsets.all(4),
+      children: <Widget> [
+        Text("Printer: ${widget.printer.toString()}\n\nPlatform: ${Platform.operatingSystem} ${Platform.operatingSystemVersion}"),
+
+        Card(
+          clipBehavior: Clip.hardEdge,
+          child: AspectRatio(
+            aspectRatio: 1760/1080, // _videoController.value.aspectRatio is not fast enough
+            child: VideoPlayer(_videoController),
+          ),
+        ),
+
+        Text("playbackSpeed: ${_videoController.value.position}"),
+        Text("Video restarts: ${_videoRestartCounter}"),
+      ],
+    );
+  }
+
 }
