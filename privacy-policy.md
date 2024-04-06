@@ -14,7 +14,7 @@ This application will only connect to Bambu Labs 3d printers, either automatical
 
 You can find Bambu Labs lengthy privacy policy here: https://bambulab.com/en/policies/privacy
 
-If you installed this app from any third party, they that third party will probably collect some personal data. Please see their privacy policies:
+If you installed this app from any third party, then that third party will probably collect some personal data. Please see their privacy policies:
 * Google Play: https://policies.google.com/privacy
 * Apple App Store: https://www.apple.com/legal/privacy/data/en/app-store/
 * Flathub: https://flathub.org/privacy-policy
