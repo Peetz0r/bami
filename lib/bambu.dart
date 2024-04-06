@@ -58,7 +58,7 @@ class Bambu {
     try {
       await _client.connect('bblp', pass);
       _client.subscribe('device/+/report', MqttQos.atMostOnce);
-    } on ConnectionException catch (e) {
+    } on Exception catch (e) {
       _client.disconnect();
       print("Failed! ${_client.connectionStatus?.returnCode}");
       String error = Casing.titleCase(_client.connectionStatus!.returnCode.toString().split('.')[1]);
@@ -66,12 +66,13 @@ class Bambu {
       showDialog(
         context: context,
         builder: (BuildContext context) {
+
           return AlertDialog(
             title: const Text('Connection failure'),
             content: Text("Error while connecting to $name: $error."),
             actions: <Widget>[
               ElevatedButton(
-                child: const Text('Cancel'),
+                child: const Text('OK'),
                 onPressed: Navigator.of(context).pop,
               ),
             ],
