@@ -21,7 +21,7 @@ void main() async {
 
   if (BAMI.isDesktop) {
     doWhenWindowReady(() {
-      appWindow.size = const Size(1280, 720);
+      appWindow.size = const Size(600, 600);
       appWindow.minSize = const Size(320, 320);
       appWindow.show();
     });
@@ -71,6 +71,7 @@ class BAMI extends StatelessWidget {
       titleWidget = ListTile(
         title: Text('BAMI', style: TextStyle(fontWeight: FontWeight.bold)),
         subtitle: Text('Bambu Advanced Monitoring Interface'),
+        contentPadding: Platform.isMacOS ? const EdgeInsets.only(left: 80.0) : null,
       );
     }
 
