@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
+import 'package:macos_window_utils/macos_window_utils.dart';
+import 'package:macos_window_utils/macos/ns_window_button_type.dart';
 
 import 'discovery.dart';
 import 'printer.dart';
@@ -15,6 +17,23 @@ void main() async {
   if (Platform.operatingSystem == 'android') {
     AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
     BAMI.isTV = androidInfo.systemFeatures.contains('android.software.leanback');
+  }
+
+  if (Platform.isMacOS) {
+    await WindowManipulator.initialize(enableWindowDelegate: true);
+
+    WindowManipulator.overrideStandardWindowButtonPosition(
+      buttonType: NSWindowButtonType.closeButton,
+      offset: const Offset(20, 20)
+    );
+    WindowManipulator.overrideStandardWindowButtonPosition(
+      buttonType: NSWindowButtonType.miniaturizeButton,
+      offset: const Offset(40, 20)
+    );
+    WindowManipulator.overrideStandardWindowButtonPosition(
+      buttonType: NSWindowButtonType.zoomButton,
+      offset: const Offset(60, 20)
+    );
   }
 
   runApp(const BAMI());
