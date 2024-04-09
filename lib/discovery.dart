@@ -24,7 +24,7 @@ class DiscoveryPage extends StatefulWidget {
     DeviceDiscoverer discoverer = DeviceDiscoverer();
     discoverer.start(port: 2021);
 
-    Stream<DiscoveredClient> discoverStream = discoverer.quickDiscoverClients(timeout: null);
+    Stream<DiscoveredClient> discoverStream = discoverer.quickDiscoverClients(timeout: null, searchInterval: null);
     // I would love to add `query: "urn:bambulab-com:device:3dprinter:1"`
     // but it sends that over a hardcoded port 1900, while it needs to be 2021
     // because Bambu uses a nonstandard variation of uPnP/SSDP
