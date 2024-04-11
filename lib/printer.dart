@@ -102,43 +102,50 @@ class _PrinterPageState extends State<PrinterPage> {
         ),
         body: LayoutBuilder(
           builder: (BuildContext context, BoxConstraints constraints) {
-            print("constraints.maxWidth = ${constraints.maxWidth}");
-            if (BAMI.isTV) return _buildTV();
-            if (constraints.maxWidth > 768) return _buildDesktop();
-            return _buildMobile();
+            if (BAMI.isTV) return _buildTV(constraints);
+            if (constraints.maxWidth > 768) return _buildDesktop(constraints);
+            return _buildMobile(constraints);
           },
         ),
       ),
     );
   }
 
-  Widget _buildTV() {
+  Widget _buildTV(BoxConstraints constraints) {
     WakelockPlus.enable();
+
+    double sidePanelWidth = constraints.maxWidth - (constraints.maxHeight * 1760/1080);
 
     return Row(
       children: <Widget> [
-        Card(
-          clipBehavior: Clip.hardEdge,
-          child: AspectRatio(
-            aspectRatio: 1760/1080, // _videoController.value.aspectRatio is not fast enough
-            child: VideoPlayer(_videoController),
+        Container(
+          child: Card(
+            clipBehavior: Clip.hardEdge,
+            elevation: 24,
+            child: AspectRatio(
+              aspectRatio: 1760/1080, // hardcoded, because _videoController.value.aspectRatio is not fast enough
+              child: VideoPlayer(_videoController),
+            ),
           ),
         ),
 
-        ListView(
-          padding: const EdgeInsets.all(4),
-          children: <Widget> [
-            Text("Printer: ${widget.printer.toString()}"),
-            Text("Platform: ${Platform.operatingSystem} ${Platform.operatingSystemVersion}"),
-            Text("Video position: ${_videoController.value.position}"),
-            Text("Video restarts: ${_videoRestartCounter}"),
-          ],
+        Container(
+          constraints: BoxConstraints.tightFor(width: sidePanelWidth),
+          child: ListView(
+            padding: const EdgeInsets.all(4),
+            children: <Widget> [
+              Text("Printer: ${widget.printer.toString()}"),
+              Text("Platform: ${Platform.operatingSystem} ${Platform.operatingSystemVersion}"),
+              Text("Video position: ${_videoController.value.position}"),
+              Text("Video restarts: ${_videoRestartCounter}"),
+            ],
+          ),
         ),
       ],
     );
   }
 
-  Widget _buildDesktop() {
+  Widget _buildDesktop(BoxConstraints constraints) {
     return ListView(
       padding: const EdgeInsets.all(4),
       children: <Widget> [
@@ -158,7 +165,7 @@ class _PrinterPageState extends State<PrinterPage> {
     );
   }
 
-  Widget _buildMobile() {
+  Widget _buildMobile(BoxConstraints constraints) {
     return ListView(
       padding: const EdgeInsets.all(4),
       children: <Widget> [
