@@ -1,8 +1,10 @@
 import 'dart:convert';
-import 'package:upnp2/upnp.dart' hide Icon;
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+
+import 'package:upnp2/upnp.dart' hide Icon;
 import 'package:url_launcher/url_launcher.dart';
-import 'package:flutter/foundation.dart' as Foundation;
 
 import 'main.dart';
 import 'bambu.dart';
@@ -71,55 +73,82 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
 
     for (Bambu printer in DiscoveryPage.discoveredPrinters) {
       widget.add(
-        Card(
-          clipBehavior: Clip.hardEdge,
-          child: InkWell(
-            splashColor: Colors.blue.withAlpha(30),
-            onTap: () {
-              if (printer.pass == null) {
-                showDialog(
-                  context: context,
-                  builder: (context) {
-
-                    _testState = 0;
-                    _tmpAutoConnect = printer.autoConnect;
-                    _tmpPass = printer.pass is String ? printer.pass! : '';
-                    return StatefulBuilder(
-                      builder: (context, setState) {
-                        return _settingsDialog(printer, setState, true);
-                      },
-                    );
-                  },
-                );
-              } else {
-                printer.connect(context);
+        Focus(
+          canRequestFocus: false,
+          onKeyEvent: (FocusNode node, KeyEvent event) {
+            if (event is KeyDownEvent) {
+              if (node.descendants.last.hasPrimaryFocus) { // if the Card has focus
+                if (event.logicalKey == LogicalKeyboardKey.arrowRight) { // and we press arrow Right
+                  node.nextFocus(); // move focus to the settings IconButton
+                  return KeyEventResult.handled;
+                }
               }
 
-            },
-            child: ListTile(
-              leading: FlutterLogo(size: 72.0),
-              title: Text(printer.name),
-              subtitle: Text('Model: ${printer.model}\nIP: ${printer.ip}'),
-              trailing: IconButton(
-                onPressed: () {
-                  showDialog(
-                    context: context,
-                    builder: (context) {
+              if (node.descendants.first.hasPrimaryFocus) { // if the settings IconButton has focus
+                if (event.logicalKey == LogicalKeyboardKey.arrowLeft) { // and we press arrow Left
+                  node.previousFocus(); // move focus to the Card
+                  return KeyEventResult.handled;
+                }
+              }
+            }
 
-                      _testState = 0;
-                      _tmpAutoConnect = printer.autoConnect;
-                      _tmpPass = printer.pass is String ? printer.pass! : '';
-                      return StatefulBuilder(
-                        builder: (context, setState) {
-                          return _settingsDialog(printer, setState);
+            return KeyEventResult.ignored;
+          },
+          child: Builder(
+            builder: (BuildContext context) {
+              return Card(
+                clipBehavior: Clip.hardEdge,
+                child: InkWell(
+                  splashColor: Colors.blue.withAlpha(30),
+                  onTap: () {
+                    if (printer.pass == null) {
+                      showDialog(
+                        context: context,
+                        builder: (context) {
+
+                          _testState = 0;
+                          _tmpAutoConnect = printer.autoConnect;
+                          _tmpPass = printer.pass is String ? printer.pass! : '';
+                          return StatefulBuilder(
+                            builder: (context, setState) {
+                              return _settingsDialog(printer, setState, true);
+                            },
+                          );
                         },
                       );
-                    },
-                  );
-                },
-                icon: const Icon(Icons.settings),
-              ),
-            ),
+                    } else {
+                      printer.connect(context);
+                    }
+
+                  },
+                  child: ListTile(
+                    leading: FlutterLogo(size: 72.0),
+                    title: Text(printer.name),
+                    subtitle: Text('Model: ${printer.model}\nIP: ${printer.ip}'),
+                    trailing: IconButton.filledTonal(
+                      onPressed: () {
+                        showDialog(
+                          context: context,
+                          builder: (context) {
+
+                            _testState = 0;
+                            _tmpAutoConnect = printer.autoConnect;
+                            _tmpPass = printer.pass is String ? printer.pass! : '';
+                            return StatefulBuilder(
+                              builder: (context, setState) {
+                                return _settingsDialog(printer, setState);
+                              },
+                            );
+                          },
+                        );
+                      },
+                      icon: const Icon(Icons.settings),
+                      focusColor: Theme.of(context).colorScheme.inversePrimary,
+                    ),
+                  ),
+                ),
+              );
+            },
           ),
         ),
       );
