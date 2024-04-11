@@ -126,6 +126,8 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
                     title: Text(printer.name),
                     subtitle: Text('Model: ${printer.model}\nIP: ${printer.ip}'),
                     trailing: IconButton.filledTonal(
+                      icon: const Icon(Icons.settings),
+                      focusColor: Theme.of(context).colorScheme.inversePrimary,
                       onPressed: () {
                         showDialog(
                           context: context,
@@ -142,8 +144,6 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
                           },
                         );
                       },
-                      icon: const Icon(Icons.settings),
-                      focusColor: Theme.of(context).colorScheme.inversePrimary,
                     ),
                   ),
                 ),
@@ -186,126 +186,151 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
 
     return Dialog(
       clipBehavior: Clip.hardEdge,
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
-        constraints: BoxConstraints.tightFor(width: 420),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12.0),
-              alignment: Alignment.centerLeft,
-              child: const Text(
-                'Settings',
-                textAlign: TextAlign.start,
-                style: TextStyle(
-                  fontSize: 24.0,
-                  fontWeight: FontWeight.w400,
-                ),
-              ),
-            ),
-            Flexible(
-              child: Scrollbar(
-                child: SingleChildScrollView(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: <Widget>[
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                        child: Card(
-                          child: ListTile(
-                            leading: FlutterLogo(size: 72.0),
-                            title: Text(printer.name),
-                            subtitle: Text('Model: ${printer.model}\nIP: ${printer.ip}'),
-                          ),
-                        ),
+      child: Focus(
+        canRequestFocus: false,
+        onKeyEvent: (FocusNode node, KeyEvent event) {
+          if (event is KeyDownEvent) {
+            print('got: ${event.logicalKey}');
+            if ([LogicalKeyboardKey.arrowRight, LogicalKeyboardKey.arrowDown].contains(event.logicalKey)) {
+              print('nextFocus');
+              node.nextFocus();
+              return KeyEventResult.handled;
+            }
+
+            if ([LogicalKeyboardKey.arrowLeft, LogicalKeyboardKey.arrowUp].contains(event.logicalKey)) {
+              print('previousFocus');
+              node.previousFocus();
+              return KeyEventResult.handled;
+            }
+          }
+
+          return KeyEventResult.ignored;
+        },
+        child: Builder(
+          builder: (BuildContext context) {
+            return Container(
+              padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
+              constraints: BoxConstraints.tightFor(width: 420),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: <Widget>[
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                    alignment: Alignment.centerLeft,
+                    child: const Text(
+                      'Settings',
+                      textAlign: TextAlign.start,
+                      style: TextStyle(
+                        fontSize: 24.0,
+                        fontWeight: FontWeight.w400,
                       ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
-                        child: TextFormField(
-                          decoration: InputDecoration(
-                            border: OutlineInputBorder(),
-                            labelText: 'Access Code',
-                            suffix: _testDisplay(),
-                          ),
-                          initialValue: _tmpPass,
-                          obscureText: true,
-                          enableSuggestions: false,
-                          autocorrect: false,
-                          keyboardType: TextInputType.visiblePassword,
-                          onChanged: (String text) {
-                            _tmpPass = text;
-                            if (_tmpPass.length == 8) {
-                              setState(() { _testState = 1; });
-                              printer.testConnection(_tmpPass).then((e) {
-                                setState(() { _testState = e ? 2 : 3; });
-                              });
-                            } else {
-                              setState(() { _testState = 0; });
-                            }
-                          },
-                        ),
-                      ),
-                      SwitchListTile(
-                        title: const Text("Auto-connect"),
-                        subtitle: const Text("Automatically connect to this printer once detected, skipping the device list"),
-                        value: _tmpAutoConnect,
-                        onChanged: (bool value) {
-                          print("autoConnect: $value");
-                          setState(() { _tmpAutoConnect = value; });
-                        },
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                        child: Card(
-                          child: Padding(
-                            padding: EdgeInsets.all(12.0),
-                            child: Column(
-                              children: [
-                                Text("You can only connect locally to a Bambu Labs 3D printer in LAN Only mode. To do this you'll need to enable LAN Only mode on the screen on your printer, and enter the Access Code from the printers display here."),
-                                Padding(
-                                  padding: EdgeInsets.all(4.0),
-                                  child: ElevatedButton(
-                                    onPressed: () {
-                                      launchUrl(Uri.parse('https://wiki.bambulab.com/en/knowledge-sharing/enable-lan-mode'));
-                                    },
-                                    child: Text("More details on Bambu Lab Wiki"),
+                    ),
+                  ),
+                  Flexible(
+                    child: Scrollbar(
+                      child: SingleChildScrollView(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: <Widget>[
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                              child: Card(
+                                child: ListTile(
+                                  leading: FlutterLogo(size: 72.0),
+                                  title: Text(printer.name),
+                                  subtitle: Text('Model: ${printer.model}\nIP: ${printer.ip}'),
+                                ),
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+                              child: TextFormField(
+                                decoration: InputDecoration(
+                                  border: OutlineInputBorder(),
+                                  labelText: 'Access Code',
+                                  suffix: _testDisplay(),
+                                ),
+                                initialValue: _tmpPass,
+                                obscureText: true,
+                                enableSuggestions: false,
+                                autocorrect: false,
+                                keyboardType: TextInputType.visiblePassword,
+                                onChanged: (String text) {
+                                  _tmpPass = text;
+                                  if (_tmpPass.length == 8) {
+                                    setState(() { _testState = 1; });
+                                    printer.testConnection(_tmpPass).then((e) {
+                                      setState(() { _testState = e ? 2 : 3; });
+                                    });
+                                  } else {
+                                    setState(() { _testState = 0; });
+                                  }
+                                },
+                              ),
+                            ),
+                            SwitchListTile(
+                              title: const Text("Auto-connect"),
+                              subtitle: const Text("Automatically connect to this printer once detected, skipping the device list"),
+                              value: _tmpAutoConnect,
+                              onChanged: (bool value) {
+                                print("autoConnect: $value");
+                                setState(() { _tmpAutoConnect = value; });
+                              },
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                              child: Card(
+                                child: Padding(
+                                  padding: EdgeInsets.all(12.0),
+                                  child: Column(
+                                    children: [
+                                      Text("You can only connect locally to a Bambu Labs 3D printer in LAN Only mode. To do this you'll need to enable LAN Only mode on the screen on your printer, and enter the Access Code from the printers display here."),
+                                      Padding(
+                                        padding: EdgeInsets.all(4.0),
+                                        child: ElevatedButton(
+                                          onPressed: () {
+                                            launchUrl(Uri.parse('https://wiki.bambulab.com/en/knowledge-sharing/enable-lan-mode'));
+                                          },
+                                          child: Text("More details on Bambu Lab Wiki"),
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
-                              ],
+                              ),
                             ),
-                          ),
+                          ],
                         ),
                       ),
-                    ],
+                    ),
                   ),
-                ),
-              ),
-            ),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 4.0),
-              child: Row (
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: <Widget>[
-                  TextButton(
-                    child: const Text('Cancel'),
-                    onPressed: Navigator.of(context).pop,
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 4.0),
+                    child: Row (
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: <Widget>[
+                        TextButton(
+                          child: const Text('Cancel'),
+                          onPressed: Navigator.of(context).pop,
 
-                  ),
-                  ElevatedButton(
-                    child: Text(connect ? 'Connect' : 'Save'),
-                    onPressed: ((_testState == 0 && _tmpPass.length == 8) || _testState == 2) ? () {
-                      printer.save(_tmpPass, _tmpAutoConnect);
-                      Navigator.of(context).pop();
-                      if (connect) printer.connect(context);
-                    } : null,
+                        ),
+                        ElevatedButton(
+                          child: Text(connect ? 'Connect' : 'Save'),
+                          onPressed: ((_testState == 0 && _tmpPass.length == 8) || _testState == 2) ? () {
+                            printer.save(_tmpPass, _tmpAutoConnect);
+                            Navigator.of(context).pop();
+                            if (connect) printer.connect(context);
+                          } : null,
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
-            ),
-          ],
+            );
+          },
         ),
       ),
     );
