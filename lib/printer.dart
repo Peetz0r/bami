@@ -59,13 +59,13 @@ class _PrinterPageState extends State<PrinterPage> {
       // No, this will not overflow. `int` can be 2^63-1, which in
       // milliseconds is over 290 million years. I think we're fine
       int newPosition = _videoController.value.position.inMilliseconds;
-
       int diff = newPosition - _videoPositionMS;
-      print("$newPosition - $_videoPositionMS = ${diff}");
+
       if (newPosition > 0 && (diff < 500 || diff > 2000)) {
         print('Stream borken, diff is $diff ms. Restarting...');
         _videoRestartCounter++;
         await _videoController.pause();
+        await _videoController.seekTo(_videoController.value.position + const Duration(minutes: 1));
         await _videoController.play();
         print('Done restarting, hopefully.');
       }
