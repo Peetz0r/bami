@@ -4,6 +4,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 import 'package:fvp/fvp.dart' as fvp;
+import 'package:wakelock_plus/wakelock_plus.dart';
 
 import 'main.dart';
 import 'bambu.dart';
@@ -112,6 +113,8 @@ class _PrinterPageState extends State<PrinterPage> {
   }
 
   Widget _buildTV() {
+    WakelockPlus.enable();
+
     return Row(
       children: <Widget> [
         Card(
