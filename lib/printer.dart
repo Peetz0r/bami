@@ -96,6 +96,135 @@ class _PrinterPageState extends State<PrinterPage> {
     super.deactivate();
   }
 
+  Widget _wideButtonsCard() {
+    return Card(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          Padding(
+            padding: EdgeInsets.symmetric(vertical: 4.0, horizontal: 12.0),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: <Widget>[
+                Text(
+                  "${(widget.printer.progress*100).floor()}%",
+                  style: Theme.of(context).textTheme.headlineMedium,
+                ),
+                Spacer(),
+                Icon(Icons.layers),
+                SizedBox(width: 8.0),
+                Text("${widget.printer.layer}/${widget.printer.layers}"),
+                Spacer(),
+                Icon(Icons.av_timer),
+                SizedBox(width: 8.0),
+                Text("${widget.printer.remainingTimeString}"),
+              ],
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
+            child: LinearProgressIndicator(
+              value: widget.printer.progress,
+            ),
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: _buttonsList(),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _tallButtonsCard() {
+    return Card(
+      child: Column(
+        mainAxisSize: MainAxisSize.max,
+        children: <Widget>[
+          Row(
+            children: <Widget> [
+              SizedBox(width: 32.0),
+          Text(
+            "${(widget.printer.progress*100).floor()}%",
+            style: Theme.of(context).textTheme.headlineLarge,
+          ),
+            ],
+          ),
+          Row(
+            children: <Widget> [
+              Icon(Icons.layers),
+              SizedBox(width: 8.0),
+              Text(
+                "${widget.printer.layer}/${widget.printer.layers}",
+                style: Theme.of(context).textTheme.headlineMedium,
+              ),
+            ],
+          ),
+          Row(
+            children: <Widget> [
+              Icon(Icons.av_timer),
+              SizedBox(width: 8.0),
+              Text(
+                "${widget.printer.remainingTimeString}",
+                style: Theme.of(context).textTheme.headlineMedium,
+              ),
+            ],
+          ),
+          Column(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: _buttonsList(),
+          ),
+        ],
+      ),
+    );
+  }
+
+  List<Widget> _buttonsList() {
+    return <Widget>[
+      (widget.printer.isPaused ?
+        Padding(
+          padding: EdgeInsets.all(8.0),
+          child: FilledButton.tonalIcon(
+            icon: const Icon(
+              Icons.start,
+              color: Colors.green,
+            ),
+            label: const Text('Resume'),
+            onPressed: () {
+              widget.printer.resume();
+            },
+          ),
+        ):
+        Padding(
+          padding: EdgeInsets.all(8.0),
+          child: FilledButton.tonalIcon(
+            icon: const Icon(
+              Icons.pause,
+              color: Colors.orange,
+            ),
+            label: const Text('Pause'),
+            onPressed: (widget.printer.isRunning ? () {
+              widget.printer.pause();
+            } : null),
+          ),
+        )
+      ),
+      Padding(
+        padding: EdgeInsets.all(8.0),
+        child: FilledButton.icon(
+          icon: const Icon(
+            Icons.stop,
+            color: Colors.red,
+          ),
+          label: const Text('Stop'),
+          onPressed: (widget.printer.isRunning ? () {
+            _stopPrintDialog();
+          } : null),
+        ),
+      ),
+    ];
+  }
+
   @override
   Widget build(BuildContext context) {
 
@@ -106,7 +235,7 @@ class _PrinterPageState extends State<PrinterPage> {
           context,
           ListTile(
             title: Text(widget.printer.name),
-            subtitle: Text(widget.printer.model),
+            subtitle: Text(widget.printer.printName ?? 'Idle'),
           ),
           PreferredSize(
             preferredSize: const Size.fromHeight(4.0),
@@ -143,18 +272,9 @@ class _PrinterPageState extends State<PrinterPage> {
             ),
           ),
         ),
-
         Container(
           constraints: BoxConstraints.tightFor(width: sidePanelWidth),
-          child: ListView(
-            padding: const EdgeInsets.all(4),
-            children: <Widget> [
-              Text("Printer: ${widget.printer.toString()}"),
-              Text("Platform: ${Platform.operatingSystem} ${Platform.operatingSystemVersion}"),
-              Text("Video position: ${_videoController.value.position}"),
-              Text("Video restarts: ${_videoRestartCounter}"),
-            ],
-          ),
+          child: _tallButtonsCard(),
         ),
       ],
     );
@@ -184,7 +304,6 @@ class _PrinterPageState extends State<PrinterPage> {
     return ListView(
       padding: const EdgeInsets.all(4),
       children: <Widget> [
-        Text("Printer: ${widget.printer.toString()}\n\nPlatform: ${Platform.operatingSystem} ${Platform.operatingSystemVersion}"),
 
         Card(
           clipBehavior: Clip.hardEdge,
@@ -193,10 +312,43 @@ class _PrinterPageState extends State<PrinterPage> {
             child: VideoPlayer(_videoController),
           ),
         ),
+        _wideButtonsCard(),
 
+        Text("Printer: ${widget.printer.toString()}\n\nPlatform: ${Platform.operatingSystem} ${Platform.operatingSystemVersion}"),
         Text("playbackSpeed: ${_videoController.value.position}"),
         Text("Video restarts: ${_videoRestartCounter}"),
       ],
+    );
+  }
+
+  void _stopPrintDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Stop'),
+          content: const Text('Do you really want to stop the print?'),
+          actions: <Widget>[
+            FilledButton.tonal(
+              child: const Text('No'),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+            FilledButton.icon(
+              icon: const Icon(
+                Icons.stop,
+                color: Colors.red,
+              ),
+              label: const Text('Yes'),
+              onPressed: () {
+                widget.printer.stop();
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        );
+      }
     );
   }
 

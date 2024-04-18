@@ -19,6 +19,7 @@ class Bambu {
   String? pass;
   bool autoConnect = false;
   Function? onReport;
+  int _sequence_id = 42;
 
   late final MqttServerClient _client;
   Map<String, dynamic>? report;
@@ -57,7 +58,7 @@ class Bambu {
   void connect(BuildContext context) async {
     try {
       await _client.connect('bblp', pass);
-      _client.subscribe('device/+/report', MqttQos.atMostOnce);
+      _client.subscribe('device/$usn/report', MqttQos.atMostOnce);
     } on Exception catch (e) {
       _client.disconnect();
       print("Failed! ${_client.connectionStatus?.returnCode}");
@@ -98,8 +99,10 @@ class Bambu {
             )
           );
           if (tmpReport!['print'] != null) {
-            report = tmpReport!['print'];
-            onReport?.call();
+            if (tmpReport!['print']['command'] == 'push_status') {
+              report = tmpReport!['print'];
+              onReport?.call();
+            }
           }
         }
       }
@@ -118,14 +121,31 @@ class Bambu {
     _client.disconnect();
   }
 
-  double? get progress {
-    if (report?['mc_percent'] != null) {
-      return report!['mc_percent']/100;
-    }
+  void _sendCommand(String command, String param) {
+    _client.publishMessage(
+      "device/$usn/request",
+      MqttQos.exactlyOnce,
+      MqttClientPayloadBuilder().addString(
+        jsonEncode({
+          'print': {
+            'command': command,
+            'param': param,
+            'sequence_id': _sequence_id,
+          }
+        })
+      ).payload!
+    );
+
+    _sequence_id++;
   }
 
-  double get layer => report?['layer_num'] ?? 0;
-  double get layers => report?['total_layer_num'] ?? 0;
+  double   get progress       => (report?['mc_percent'] ?? 0)/100;
+  int      get layer          => report?['layer_num'] ?? 0;
+  int      get layers         => report?['total_layer_num'] ?? 0;
+  String   get printName      => report?['subtask_name'] ?? '';
+  bool     get isRunning      => report?['gcode_state'] == 'RUNNING';
+  bool     get isPaused       => report?['gcode_state'] == 'PAUSE';
+  Duration get remainingTime  => Duration(minutes: report?['mc_remaining_time'] ?? 0);
 
   String get videoStreamUri {
     if (report?['ipcam']['rtsp_url'] == null) return '';
@@ -138,6 +158,30 @@ class Bambu {
       port: uri.port,
       path: uri.path,
     ).toString();
+  }
+
+  String get remainingTimeString {
+    String out = "";
+    if (remainingTime.inHours >= 24) {
+      out += "${(remainingTime.inHours/24).floor()}d ";
+    }
+
+    out += (remainingTime.inHours % 60).toString().padLeft(2, "0");
+    out += ":";
+    out += (remainingTime.inMinutes % 60).toString().padLeft(2, "0");
+    return out;
+  }
+
+  void pause() {
+    _sendCommand('pause', '');
+  }
+
+  void resume() {
+    _sendCommand('resume', '');
+  }
+
+  void stop() {
+    _sendCommand('stop', '');
   }
 
   String toString() {
