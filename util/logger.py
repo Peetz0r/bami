@@ -34,6 +34,8 @@ while True:
   if found:
     print("We have a password for that, assuming it's our printer")
     break
+s.close()
+
 
 def on_message(client, userdata, message):
   j = json.loads(message.payload.removesuffix(b"\0"))
