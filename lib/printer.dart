@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:async';
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
@@ -33,6 +34,7 @@ class PrinterPage extends StatefulWidget {
 }
 
 class _PrinterPageState extends State<PrinterPage> {
+  late AppLifecycleListener _appLifecycleListener;
   late VideoPlayerController _videoController;
   late Timer _videoWatchdogTimer;
 
@@ -42,6 +44,10 @@ class _PrinterPageState extends State<PrinterPage> {
   @override
   void initState() {
     super.initState();
+
+    _appLifecycleListener = AppLifecycleListener(
+      onExitRequested: _onExitRequested,
+    );
 
     print("Starting video player with URL ${widget.printer.videoStreamUri}");
     _videoController = VideoPlayerController.network(widget.printer.videoStreamUri);
@@ -73,8 +79,17 @@ class _PrinterPageState extends State<PrinterPage> {
     });
   }
 
+  Future<AppExitResponse> _onExitRequested() async {
+    print("Exit requested");
+    _videoWatchdogTimer.cancel();
+    _videoController.dispose();
+    widget.printer.disconnect();
+    return AppExitResponse.exit;
+  }
+
   @override
   void deactivate() {
+    print("Deactivating");
     _videoWatchdogTimer.cancel();
     _videoController.dispose();
     widget.printer.disconnect();
