@@ -3,6 +3,8 @@ import 'dart:async';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/src/animation/animation.dart';
+
 import 'package:video_player/video_player.dart';
 import 'package:fvp/fvp.dart' as fvp;
 import 'package:wakelock_plus/wakelock_plus.dart';
@@ -225,6 +227,66 @@ class _PrinterPageState extends State<PrinterPage> {
     ];
   }
 
+  Widget _videoCard() {
+    return Card(
+      clipBehavior: Clip.hardEdge,
+      child: AspectRatio(
+        aspectRatio: 1760/1080, // _videoController.value.aspectRatio is not fast enough
+        child: VideoPlayer(_videoController),
+      ),
+    );
+  }
+
+  Widget _amsCard() {
+    List<Widget> amsColumn = [];
+    for (final ams in widget.printer.amsFilaments) {
+      List<Widget> filamentRow = [];
+      for (final filament in ams) {
+        filamentRow.add(
+          Padding(
+            padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 2.0),
+            child: Column(
+              children: <Widget>[
+                ConstrainedBox(
+                  constraints: const BoxConstraints.tightForFinite(width: 20, height: 32),
+                  child: RotatedBox(
+                    quarterTurns: -1,
+                    child: LinearProgressIndicator(
+                      value: filament.remain,
+                      valueColor: AlwaysStoppedAnimation<Color>(filament.color),
+                    ),
+                  ),
+                ),
+                ConstrainedBox(
+                  constraints: const BoxConstraints.tightForFinite(width: 32, height: 32),
+                  child: Text(
+                    filament.name,
+                    maxLines: 2,
+                    //~ overflow: TextOverflow.e,
+                    style: Theme.of(context).textTheme.labelSmall,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      }
+
+      amsColumn.add(
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: filamentRow,
+        ),
+      );
+    }
+
+    return Card(
+      child: Column(
+        children: amsColumn,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
 
@@ -263,18 +325,20 @@ class _PrinterPageState extends State<PrinterPage> {
     return Row(
       children: <Widget> [
         Container(
-          child: Card(
-            clipBehavior: Clip.hardEdge,
-            elevation: 24,
-            child: AspectRatio(
-              aspectRatio: 1760/1080, // hardcoded, because _videoController.value.aspectRatio is not fast enough
-              child: VideoPlayer(_videoController),
-            ),
-          ),
+          child: _videoCard(),
         ),
         Container(
           constraints: BoxConstraints.tightFor(width: sidePanelWidth),
-          child: _tallButtonsCard(),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: <Widget>[
+                _tallButtonsCard(),
+                _amsCard(),
+              ],
+            ),
+          ),
         ),
       ],
     );
@@ -284,16 +348,13 @@ class _PrinterPageState extends State<PrinterPage> {
     return ListView(
       padding: const EdgeInsets.all(4),
       children: <Widget> [
+        Text("Desktop"),
+
+        _videoCard(),
+        _wideButtonsCard(),
+        _amsCard(),
+
         Text("Printer: ${widget.printer.toString()}\n\nPlatform: ${Platform.operatingSystem} ${Platform.operatingSystemVersion}"),
-
-        Card(
-          clipBehavior: Clip.hardEdge,
-          child: AspectRatio(
-            aspectRatio: 1760/1080, // _videoController.value.aspectRatio is not fast enough
-            child: VideoPlayer(_videoController),
-          ),
-        ),
-
         Text("playbackSpeed: ${_videoController.value.position}"),
         Text("Video restarts: ${_videoRestartCounter}"),
       ],
@@ -304,15 +365,11 @@ class _PrinterPageState extends State<PrinterPage> {
     return ListView(
       padding: const EdgeInsets.all(4),
       children: <Widget> [
+        Text("Mobile"),
 
-        Card(
-          clipBehavior: Clip.hardEdge,
-          child: AspectRatio(
-            aspectRatio: 1760/1080, // _videoController.value.aspectRatio is not fast enough
-            child: VideoPlayer(_videoController),
-          ),
-        ),
+        _videoCard(),
         _wideButtonsCard(),
+        _amsCard(),
 
         Text("Printer: ${widget.printer.toString()}\n\nPlatform: ${Platform.operatingSystem} ${Platform.operatingSystemVersion}"),
         Text("playbackSpeed: ${_videoController.value.position}"),

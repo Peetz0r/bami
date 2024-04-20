@@ -188,6 +188,28 @@ class Bambu {
     return "Bambu([$usn] | $model | $ip | $name | Pass: ${pass == null ? 'N/A' : '*'*pass!.length})";
   }
 
+  List<List<Filament>> get amsFilaments {
+    List<List<Filament>> allAmsfilaments = [];
+
+    for (final ams in report?['ams']['ams']) {
+      List<Filament> thisAmsFilaments = [];
+      for (final item in ams['tray']) {
+        int c = int.tryParse(item['tray_color'], radix: 16) ?? 0;
+        // Bambu provides RGBA, flutter needs ARGB
+        c = (c >> 8) | ((c & 0xff) << 24);
+        Filament filament = Filament(
+          Color(c),
+          item['tray_sub_brands'],
+          item['remain']/100,
+        );
+        thisAmsFilaments.add(filament);
+      }
+    allAmsfilaments.add(thisAmsFilaments);
+    }
+
+    return allAmsfilaments;
+  }
+
   Map<String, Object?> toJson() {
     return {
       'pass': pass,
@@ -195,4 +217,16 @@ class Bambu {
     };
   }
 
+}
+
+class Filament {
+  Color color;
+  String name;
+  double remain;
+
+  Filament(this.color, this.name, this.remain);
+
+  String toString() {
+    return "Filament($name (${(remain*100).floor()}%) RGB(${color.red}, ${color.green}, ${color.blue})";
+  }
 }
