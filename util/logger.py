@@ -9,7 +9,7 @@ from gi.repository import Secret
 passwords = Secret.password_lookup_sync(None, { "account": "nl.peetz0r.bami.secureStorage" }, None)
 password_dict = json.loads(passwords)
 
-print(f"We have {len(password_dict)} passwords for these printers:")
+print(f"We have passwords for these {len(password_dict)} printers:")
 for printer in password_dict.keys():
   print(f" - {printer}")
 
